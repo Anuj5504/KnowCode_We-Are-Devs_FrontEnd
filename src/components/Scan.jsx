@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 const Scan = () => {
     const [selectedFile, setSelectedFile] = useState(null);
@@ -10,122 +11,265 @@ const Scan = () => {
         itemName: '',
         category: '',
         condition: '',
-        weight: '',
-        quantity: '',
+        weight: 0,
+        quantity: 1,
         location: '',
         donationOrSale: 'donate',
+        price: 0,
+        biddingEnabled: false,
+        biddingEndTime: "2025-02-25T23:59:59",
+        status: 'pending',
+        biddingStatus: 'active'
     });
     const videoRef = useRef(null);
     const streamRef = useRef(null);
+    const isLoggedIn = JSON.parse(localStorage.getItem('userInfo')); // Get user data from localStorage
+    const walletAddress = isLoggedIn ? isLoggedIn.walletAddress : '';
+    const userId = isLoggedIn ? isLoggedIn._id : '';
 
-    // Cleanup function for camera stream
+    // Add a state to track if camera is ready
+    const [isCameraReady, setIsCameraReady] = useState(false);
+
+    // Modified useEffect to handle camera initialization
     useEffect(() => {
+        let mounted = true;
+
+        const initCamera = async () => {
+            if (isUsingCamera && !isCameraReady) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: 'environment',
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        },
+                        audio: false
+                    });
+
+                    if (mounted && videoRef.current) {
+                        videoRef.current.srcObject = stream;
+                        streamRef.current = stream;
+                        videoRef.current.onloadedmetadata = () => {
+                            if (mounted) {
+                                videoRef.current.play();
+                                setIsCameraReady(true);
+                            }
+                        };
+                    }
+                } catch (err) {
+                    console.error('Error accessing camera:', err);
+                    if (mounted) {
+                        setCameraError('Unable to access camera. Please make sure you have granted camera permissions.');
+                        setIsUsingCamera(false);
+                        toast.error('Camera access denied. Please check your permissions.');
+                    }
+                }
+            }
+        };
+
+        initCamera();
+
         return () => {
+            mounted = false;
             if (streamRef.current) {
                 streamRef.current.getTracks().forEach(track => track.stop());
             }
         };
-    }, []);
+    }, [isUsingCamera]);
 
-    const startCamera = async () => {
-        try {
-            setCameraError(null);
-            const constraints = {
-                video: {
-                    facingMode: 'environment', // Use back camera if available
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
-            };
-
-            const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            streamRef.current = stream;
-
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-                videoRef.current.play().catch(e => console.error('Error playing video:', e));
-            }
-
-            setIsUsingCamera(true);
-        } catch (err) {
-            console.error('Error accessing camera:', err);
-            setCameraError('Unable to access camera. Please make sure you have granted camera permissions.');
-            setIsUsingCamera(false);
-        }
+    // Modified startCamera function
+    const startCamera = () => {
+        setIsUsingCamera(true);
+        setCameraError(null);
     };
 
+    // Modified stopCamera function
     const stopCamera = () => {
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(track => track.stop());
-            setIsUsingCamera(false);
         }
+        setIsUsingCamera(false);
+        setIsCameraReady(false);
+        videoRef.current = null;
     };
 
+    // Modified capturePhoto function
     const capturePhoto = () => {
-        if (videoRef.current) {
+        if (videoRef.current && isCameraReady) {
             const canvas = document.createElement('canvas');
-            canvas.width = videoRef.current.videoWidth;
-            canvas.height = videoRef.current.videoHeight;
-            canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
+            const video = videoRef.current;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+
+            // Draw the video frame to the canvas
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
             canvas.toBlob((blob) => {
                 setSelectedFile(blob);
                 setPreview(canvas.toDataURL('image/jpeg'));
-            }, 'image/jpeg');
-            stopCamera();
+                toast.success('Photo captured successfully!');
+                stopCamera();
+            }, 'image/jpeg', 0.8);
         }
     };
 
     const handleFileSelect = (event) => {
         const file = event.target.files[0];
         if (file) {
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                toast.error('File size should be less than 5MB');
+                return;
+            }
             setSelectedFile(file);
             const reader = new FileReader();
             reader.onloadend = () => {
                 setPreview(reader.result);
+                toast.success('File selected successfully!');
             };
             reader.readAsDataURL(file);
         }
     };
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setProductDetails(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        const { name, value, type, checked } = e.target;
+        setProductDetails(prev => {
+            const newState = {
+                ...prev,
+                [name]: type === 'checkbox' ? checked : value
+            };
+
+            // If changing donationOrSale, update price accordingly
+            if (name === 'donationOrSale') {
+                newState.price = value === 'donate' ? '0' : newState.price;
+            }
+
+            return newState;
+        });
     };
 
     const handleUpload = async () => {
-        if (!selectedFile) return;
+        if (!selectedFile) {
+            toast.error('Please select an image or take a photo');
+            return;
+        }
 
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        Object.keys(productDetails).forEach(key => {
-            formData.append(key, productDetails[key]);
-        });
-        formData.append('user', 'user_id_here'); // Replace with actual user ID
+        // Validate required fields
+        const requiredFields = ['itemName', 'category', 'condition', 'weight', 'quantity', 'location'];
+        const missingFields = requiredFields.filter(field => !productDetails[field]);
+        if (missingFields.length > 0) {
+            toast.error(`Please fill in: ${missingFields.join(', ')}`);
+            return;
+        }
+
+        // Validate numeric fields
+        if (isNaN(productDetails.weight) || productDetails.weight <= 0) {
+            toast.error('Weight must be a positive number');
+            return;
+        }
+
+        if (isNaN(productDetails.quantity) || productDetails.quantity <= 0) {
+            toast.error('Quantity must be a positive number');
+            return;
+        }
+
+        const loadingToast = toast.loading('Uploading product...');
 
         try {
-            const response = await fetch('http://localhost:3000/api/ewaste', {
-                method: 'POST',
-                body: formData,
+            const formData = new FormData();
+
+            // Append the file with correct field name
+            formData.append('file', selectedFile, 'product-image.jpg');
+
+            // Get user's wallet address
+            const userInfo = localStorage.getItem('userInfo');
+            const walletAddress = userInfo ? JSON.parse(userInfo).walletAddress : null;
+
+            if (!walletAddress) {
+                toast.error('Please connect your wallet first');
+                return;
+            }
+
+            // Format the data
+            const formattedDetails = {
+                user: walletAddress,
+                itemName: productDetails.itemName,
+                category: productDetails.category,
+                condition: productDetails.condition,
+                weight: Number(productDetails.weight),
+                quantity: Number(productDetails.quantity),
+                location: productDetails.location,
+                donationOrSale: productDetails.donationOrSale === 'sale' ? 'sell' : 'donate', // Fix enum value
+                price: productDetails.donationOrSale === 'donate' ? 0 : Number(productDetails.price || 0),
+                biddingEnabled: productDetails.biddingEnabled ? 'true' : 'false', // Convert to string
+                biddingEndTime: productDetails.biddingEnabled ? productDetails.biddingEndTime : undefined,
+                status: 'pending',
+                biddingStatus: 'active'
+            };
+
+            // Append all fields as text
+            Object.entries(formattedDetails).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    // Convert all values to strings
+                    formData.append(key, String(value));
+                }
             });
-            const data = await response.json();
+
+            // Log the actual data being sent
+            console.log('Sending data:');
+            for (let pair of formData.entries()) {
+                console.log(`${pair[0]}: ${pair[1]}`);
+            }
+
+            const response = await fetch('http://localhost:3000/api/ewaste/create', {
+                method: 'POST',
+                headers: {
+                    'Authorization': walletAddress,
+                },
+                body: formData
+            });
+
+            const responseText = await response.text();
+            console.log('Raw server response:', responseText);
+
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                console.error('Failed to parse response:', e);
+                throw new Error(responseText || 'Invalid server response');
+            }
+
+            if (!response.ok) {
+                throw new Error(data.error || data.message || 'Upload failed');
+            }
+
             console.log('Upload successful:', data);
-            // Reset form and preview
+            toast.success('Product uploaded successfully!');
+
+            // Reset form with correct enum value
             setSelectedFile(null);
             setPreview(null);
             setProductDetails({
                 itemName: '',
                 category: '',
                 condition: '',
-                weight: '',
-                quantity: '',
+                weight: 0,
+                quantity: 1,
                 location: '',
                 donationOrSale: 'donate',
+                price: 0,
+                biddingEnabled: false,
+                biddingEndTime: "2025-02-25T23:59:59",
+                status: 'pending',
+                biddingStatus: 'active'
             });
+
         } catch (error) {
             console.error('Upload failed:', error);
+            toast.error(error.message || 'Failed to upload product. Please try again.');
+        } finally {
+            toast.dismiss(loadingToast);
         }
     };
 
@@ -145,31 +289,33 @@ const Scan = () => {
                             {isUsingCamera ? (
                                 <div className="space-y-4">
                                     {cameraError ? (
-                                        <div className="text-red-500">{cameraError}</div>
+                                        <div className="text-red-500 p-4">{cameraError}</div>
                                     ) : (
-                                        <>
+                                        <div className="relative">
                                             <video
                                                 ref={videoRef}
                                                 autoPlay
                                                 playsInline
-                                                className="w-full h-64 object-cover rounded-lg"
-                                                style={{ transform: 'scaleX(-1)' }} // Mirror the video
+                                                muted
+                                                className="w-full h-64 object-cover rounded-lg bg-black"
                                             />
-                                            <div className="flex justify-center space-x-4">
-                                                <button
-                                                    onClick={capturePhoto}
-                                                    className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-                                                >
-                                                    Capture Photo
-                                                </button>
-                                                <button
-                                                    onClick={stopCamera}
-                                                    className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                        </>
+                                            {isCameraReady && (
+                                                <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-4">
+                                                    <button
+                                                        onClick={capturePhoto}
+                                                        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+                                                    >
+                                                        Capture Photo
+                                                    </button>
+                                                    <button
+                                                        onClick={stopCamera}
+                                                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
                             ) : (
@@ -289,15 +435,33 @@ const Scan = () => {
                                 <option value="donate">Donate</option>
                                 <option value="sell">Sell</option>
                             </select>
+                            <input
+                                type="number"
+                                name="price"
+                                value={productDetails.price}
+                                onChange={handleInputChange}
+                                placeholder="Price (in INR)"
+                                disabled={productDetails.donationOrSale === 'donate'}
+                                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${productDetails.donationOrSale === 'donate' ? 'bg-gray-100' : ''
+                                    }`}
+                            />
+                            <div className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    name="biddingEnabled"
+                                    checked={productDetails.biddingEnabled}
+                                    onChange={handleInputChange}
+                                    className="rounded text-green-500 focus:ring-green-500"
+                                />
+                                <label className="text-sm text-gray-600">Enable Bidding</label>
+                            </div>
                         </div>
 
+                        {/* Upload Button */}
                         <button
                             onClick={handleUpload}
                             disabled={!selectedFile || !productDetails.itemName}
-                            className={`w-full py-3 px-4 rounded-md text-white font-medium ${selectedFile && productDetails.itemName
-                                    ? 'bg-green-600 hover:bg-green-700'
-                                    : 'bg-gray-400 cursor-not-allowed'
-                                } transition-colors`}
+                            className="w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
                         >
                             Upload Product
                         </button>

@@ -1,19 +1,31 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Products from './Products';
 import Scan from './Scan';
 import Profile from './profile';
+import { FaQrcode, FaBoxOpen, FaUser, FaBars, FaTimes, FaDotCircle, FaRecycle } from 'react-icons/fa';
 
 const MainPage = () => {
-    const [activeTab, setActiveTab] = useState('products');
+    const [activeComponent, setActiveComponent] = useState('products');
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [isExpanded, setIsExpanded] = useState(true);
+    const dragControls = useDragControls();
 
-    const renderContent = () => {
-        switch (activeTab) {
-            case 'products':
-                return <Products />;
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const renderComponent = () => {
+        switch (activeComponent) {
             case 'scan':
                 return <Scan />;
+            case 'products':
+                return <Products />;
             case 'profile':
                 return <Profile />;
             default:
@@ -21,133 +33,179 @@ const MainPage = () => {
         }
     };
 
-    // Animation variants
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                duration: 0.5,
-                staggerChildren: 0.1
-            }
-        }
-    };
+    // Mobile Navigation with enhanced animations
+    const MobileNav = () => (
+        <motion.div
+            initial={{ y: 100 }}
+            animate={{ y: 0 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-lg shadow-2xl rounded-2xl z-50 px-6 py-4"
+        >
+            <div className="flex items-center gap-8">
+                <NavButton icon={<FaQrcode />} label="Scan" component="scan" />
+                <NavButton icon={<FaBoxOpen />} label="Products" component="products" />
+                <NavButton icon={<FaUser />} label="Profile" component="profile" />
+            </div>
+        </motion.div>
+    );
 
-    const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: {
-            y: 0,
-            opacity: 1
-        }
-    };
+    // Enhanced Desktop Floating Sidebar
+    const FloatingSidebar = () => (
+        <motion.div
+            drag
+            dragControls={dragControls}
+            dragMomentum={false}
+            dragElastic={0}
+            initial={{ x: 20, y: '20%' }}
+            className="fixed left-4 top-0 z-50 cursor-move"
+            whileHover={{ scale: 1.02 }}
+            whileDrag={{ scale: 1.05 }}
+        >
+            <motion.div
+                className={`bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden transition-all duration-500 ${isExpanded ? 'w-64' : 'w-20'
+                    }`}
+            >
+                {/* Header with Logo */}
+                <motion.div
+                    className="p-6 border-b border-gray-100 flex justify-between items-center"
+                    whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.95)' }}
+                >
+                    <motion.div
+                        className="flex items-center gap-3 overflow-hidden"
+                    >
+                        <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+                            className="flex-shrink-0"
+                        >
+                            <FaRecycle className="text-2xl text-green-500" />
+                        </motion.div>
+                        <motion.span
+                            initial={{ opacity: 0, width: 0 }}
+                            animate={{
+                                opacity: isExpanded ? 1 : 0,
+                                width: isExpanded ? 'auto' : 0
+                            }}
+                            transition={{ duration: 0.3 }}
+                            className="font-bold text-gray-800 whitespace-nowrap"
+                        >
+                            EcoRecycle
+                        </motion.span>
+                    </motion.div>
+                    <motion.button
+                        whileHover={{ rotate: 180 }}
+                        transition={{ duration: 0.3 }}
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        className="p-2 hover:bg-gray-100 rounded-xl text-gray-500"
+                    >
+                        {isExpanded ? <FaTimes /> : <FaBars />}
+                    </motion.button>
+                </motion.div>
+
+                {/* Navigation Items */}
+                <div className="p-4 space-y-3">
+                    <SidebarButton
+                        icon={<FaQrcode />}
+                        label="Scan Items"
+                        component="scan"
+                        expanded={isExpanded}
+                    />
+                    <SidebarButton
+                        icon={<FaBoxOpen />}
+                        label="Browse Products"
+                        component="products"
+                        expanded={isExpanded}
+                    />
+                    <SidebarButton
+                        icon={<FaUser />}
+                        label="My Profile"
+                        component="profile"
+                        expanded={isExpanded}
+                    />
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+
+    // Enhanced Mobile Navigation Button
+    const NavButton = ({ icon, label, component }) => (
+        <motion.button
+            whileHover={{ y: -2 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setActiveComponent(component)}
+            className="relative"
+        >
+            <motion.div
+                className={`flex flex-col items-center space-y-1 p-2 rounded-xl transition-colors ${activeComponent === component
+                        ? 'text-green-500'
+                        : 'text-gray-500 hover:text-green-500'
+                    }`}
+            >
+                <span className="text-2xl">{icon}</span>
+                <span className="text-xs font-medium">{label}</span>
+                {activeComponent === component && (
+                    <motion.div
+                        layoutId="activeIndicator"
+                        className="absolute -bottom-1 w-12 h-1 bg-green-500 rounded-full"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                )}
+            </motion.div>
+        </motion.button>
+    );
+
+    // Enhanced Sidebar Button
+    const SidebarButton = ({ icon, label, component, expanded }) => (
+        <motion.button
+            whileHover={{ x: 5 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveComponent(component)}
+            className={`w-full flex items-center gap-4 p-4 rounded-xl transition-all relative ${activeComponent === component
+                    ? 'bg-green-100/80 text-green-600'
+                    : 'hover:bg-gray-100/80 text-gray-600'
+                }`}
+        >
+            <motion.div
+                className="relative flex-shrink-0"
+                animate={{
+                    scale: activeComponent === component ? 1.2 : 1,
+                    rotate: activeComponent === component ? 360 : 0
+                }}
+                transition={{ duration: 0.3 }}
+            >
+                <span className="text-xl">{icon}</span>
+                {activeComponent === component && (
+                    <motion.div
+                        className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"
+                        layoutId="activeDot"
+                    />
+                )}
+            </motion.div>
+
+            {expanded && (
+                <motion.span
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    className="text-sm font-medium whitespace-nowrap flex-grow text-left"
+                >
+                    {label}
+                </motion.span>
+            )}
+
+            {activeComponent === component && expanded && (
+                <motion.div
+                    layoutId="activeSidebarIndicator"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 bg-green-500 rounded-r-full"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+            )}
+        </motion.button>
+    );
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Desktop View */}
-            <div className="hidden md:block pt-24">
-                <motion.div
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
-                >
-                    <div className="grid grid-cols-3 gap-8 mb-8">
-                        <motion.div
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.05 }}
-                            className={`p-6 rounded-xl shadow-lg cursor-pointer ${activeTab === 'products' ? 'bg-green-500 text-white' : 'bg-white'
-                                }`}
-                            onClick={() => setActiveTab('products')}
-                        >
-                            <div className="flex flex-col items-center space-y-4">
-                                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                </svg>
-                                <span className="text-lg font-semibold">Products</span>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.05 }}
-                            className={`p-6 rounded-xl shadow-lg cursor-pointer ${activeTab === 'scan' ? 'bg-green-500 text-white' : 'bg-white'
-                                }`}
-                            onClick={() => setActiveTab('scan')}
-                        >
-                            <div className="flex flex-col items-center space-y-4">
-                                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span className="text-lg font-semibold">Scan</span>
-                            </div>
-                        </motion.div>
-
-                        <motion.div
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.05 }}
-                            className={`p-6 rounded-xl shadow-lg cursor-pointer ${activeTab === 'profile' ? 'bg-green-500 text-white' : 'bg-white'
-                                }`}
-                            onClick={() => setActiveTab('profile')}
-                        >
-                            <div className="flex flex-col items-center space-y-4">
-                                <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                                <span className="text-lg font-semibold">Profile</span>
-                            </div>
-                        </motion.div>
-                    </div>
-                </motion.div>
-            </div>
-
-            {/* Content Area */}
-            <div className="pb-20 md:pb-0">
-                {renderContent()}
-            </div>
-
-            {/* Mobile Bottom Navigation */}
-            <motion.div
-                initial={{ y: 100 }}
-                animate={{ y: 0 }}
-                className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg"
-            >
-                <div className="flex justify-around items-center h-16">
-                    <button
-                        onClick={() => setActiveTab('products')}
-                        className={`flex flex-col items-center justify-center w-1/3 h-full ${activeTab === 'products' ? 'text-green-500' : 'text-gray-500'
-                            }`}
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                        </svg>
-                        <span className="text-xs mt-1">Products</span>
-                    </button>
-
-                    <button
-                        onClick={() => setActiveTab('scan')}
-                        className={`flex flex-col items-center justify-center w-1/3 h-full ${activeTab === 'scan' ? 'text-green-500' : 'text-gray-500'
-                            }`}
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span className="text-xs mt-1">Scan</span>
-                    </button>
-
-                    <button
-                        onClick={() => setActiveTab('profile')}
-                        className={`flex flex-col items-center justify-center w-1/3 h-full ${activeTab === 'profile' ? 'text-green-500' : 'text-gray-500'
-                            }`}
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        <span className="text-xs mt-1">Profile</span>
-                    </button>
-                </div>
-            </motion.div>
+            {renderComponent()}
+            {isMobile ? <MobileNav /> : <FloatingSidebar />}
         </div>
     );
 };

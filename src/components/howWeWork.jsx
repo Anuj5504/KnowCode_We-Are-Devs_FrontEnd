@@ -140,7 +140,7 @@ const HowWeWork = () => {
   };
 
   return (
-    <div className="relative lg:min-h-screen  overflow-hidden pt-10 flex items-center justify-center">
+    <div className="relative  bg-green-50 overflow-hidden flex items-center pt-10 justify-center">
       {/* Animated Background */}
       <motion.div
         variants={backgroundVariants}

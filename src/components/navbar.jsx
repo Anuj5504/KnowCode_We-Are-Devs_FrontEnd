@@ -26,10 +26,10 @@ const Navbar = () => {
         rewardsEarned: 0, // Default value if no rewards are provided
       };
 
-      
+
       // Store the user info in localStorage
       localStorage.setItem('userInfo', JSON.stringify(userInfo));
-      
+
       // Set the stored user info to state
       setStoredUser(userInfo);
       console.log('User Info:', storedUser);
@@ -70,10 +70,15 @@ const Navbar = () => {
   }, [coins]);
 
   return (
-    <div className="">
+    <div className="w-full font-rubik">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-20 items-center">
         {/* Logo */}
-        <Link to="/" className="text-2xl font-bold text-green-700">E-Waste<span className="text-orange-500">-X</span></Link>
+        <Link
+          to="/"
+          className="text-2xl font-extrabold text-green-700 hover:scale-105 transition-transform"
+        >
+          E-Waste<span className="text-orange-500 bg-gradient-to-r from-orange-500 to-yellow-400 bg-clip-text text-transparent">-X</span>
+        </Link>
 
         {/* Mobile Menu Button */}
         <button className="md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
@@ -96,7 +101,6 @@ const Navbar = () => {
           )}
         </div>
       </div>
-
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
@@ -107,8 +111,8 @@ const Navbar = () => {
               <ProfileDropdown
                 isDropdownOpen={isDropdownOpen}
                 setIsDropdownOpen={setIsDropdownOpen}
-                user={storedUser} // Use the storedUser state for user data
-                handleLogout={handleLogout} // Pass the logout function
+                user={storedUser}
+                handleLogout={handleLogout}
               />
             ) : (
               <button onClick={handleLogin} className="text-green-700 font-medium">Sign In</button>
@@ -129,9 +133,29 @@ const CoinsDisplay = ({ roundedCoins, rewardsEarned }) => (
 
 const NavLinks = () => (
   <ul className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
-    {['Store', 'Impact Dashboard', 'Leaderboard'].map((item, index) => (
+    {['Redeem Coin', 'Impact Dashboard', 'Leader Board'].map((item, index) => (
       <li key={index}>
-        <Link to={`/${item.replace(/\s/g, '').toLowerCase()}`} className="text-gray-600 hover:text-green-700 font-medium transition duration-300">{item}</Link>
+        <Link
+          to={`/${item.replace(/\s/g, '').toLowerCase()}`}
+          className="relative inline-block px-3 py-2 text-gray-600 font-medium group"
+        >
+          <motion.span
+            className="relative inline-block"
+            whileHover={{
+              rotateX: [-10, 10],
+              y: [-3, 3],
+              transition: {
+                duration: 0.4,
+                repeat: Infinity,
+                repeatType: "reverse"
+              }
+            }}
+          >
+            {item}
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-green-600 to-green-400
+              group-hover:w-full transition-all duration-300" />
+          </motion.span>
+        </Link>
       </li>
     ))}
   </ul>
