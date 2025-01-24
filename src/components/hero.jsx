@@ -45,6 +45,7 @@ const HeroSection = () => {
           Get Started
         </motion.button>
       </motion.div>
+     
     </motion.div>
   );
 };

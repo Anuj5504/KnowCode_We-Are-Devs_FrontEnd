@@ -2,6 +2,9 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import HeroSection from './hero';
+import HowWeWork from './howWeWork';
+import { Impact } from './impact';
+import Card from './ui/card';
 
 // Animation variants
 const fadeInUp = {
@@ -89,64 +92,16 @@ const HomePage = () => {
       {/* Hero Section */}
       <HeroSection />
 
-      {/* impact */}
       <motion.div
-        ref={impactRef}
+        ref={approachRef}
         initial="hidden"
-        animate={impactInView ? "visible" : "hidden"}
-        variants={staggerContainer}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16"
+        animate={"visible"}
+        variants={fadeInUp}
+        className="bg-green-50 py-16 relative overflow-hidden"
       >
-        <motion.div 
-          className='bg-slate-900 h-[40vh] rounded-3xl p-6'
-          initial="initial"
-          animate="animate"
-          variants={gentlePulse}
-        >
-          <motion.h2 
-            variants={fadeInUp} 
-            className="text-3xl font-bold text-green-700 text-center mb-12"
-          >
-            Environmental Impact!
-          </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[ 
-              { name: 'Eco Rainbow Shoes', price: 749, discount: 400, img: '/eco-rainbow-shoes.jpg' },
-              { name: 'Eco Bombastic Shoes', price: 899, discount: 250, img: '/eco-bombastic-shoes.jpg' },
-              { name: 'Eco Casual Shoes', price: 599, discount: 300, img: '/eco-casual-shoes.jpg' }
-            ].map((product, index) => (
-              <motion.div 
-                key={index} 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                initial="initial"
-                animate="animate"
-                custom={index}
-                variants={{
-                  ...float,
-                  animate: {
-                    ...float.animate,
-                    transition: {
-                      ...float.animate.transition,
-                      delay: index * 0.2,
-                      repeatType: 'reverse'
-                    }
-                  }
-                }}
-                className="bg-white shadow-lg rounded-lg overflow-hidden"
-              >
-                <div className="p-6 h-[50%]">
-                  <h3 className="text-xl font-bold text-green-700 mb-2">{product.name}</h3>
-                  <p className="text-gray-600 mb-4">Sustainable and stylish.</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-green-600 font-bold">${product.price}</span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        <HowWeWork />
       </motion.div>
+      <Impact />
 
       <motion.div
         ref={approachRef}
@@ -163,7 +118,7 @@ const HomePage = () => {
           style={{ backgroundSize: "200% 100%" }}
         />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <motion.h2 
+          <motion.h2
             variants={slideInLeft}
             initial="initial"
             animate="animate"
@@ -171,17 +126,17 @@ const HomePage = () => {
           >
             Our Sustainable Approach
           </motion.h2>
-          <motion.p 
+          <motion.p
             variants={slideInRight}
             className="text-gray-600 text-lg text-center max-w-2xl mx-auto"
           >
-            Our sustainable approach helps recycling and reselling Electronic Waste 
+            Our sustainable approach helps recycling and reselling Electronic Waste
           </motion.p>
         </div>
       </motion.div>
 
       {/* Footer Section */}
-      <motion.footer 
+      <motion.footer
         ref={footerRef}
         initial="hidden"
         animate={footerInView ? "visible" : "hidden"}
