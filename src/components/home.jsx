@@ -4,9 +4,9 @@ import { useInView } from 'react-intersection-observer';
 import HeroSection from './hero';
 import HowWeWork from './howWeWork';
 import { Impact } from './impact';
-import Card from './ui/card';
 import { useState } from 'react';
 import { LuCircleMinus, LuCirclePlus } from 'react-icons/lu';
+import Footer from './footer';
 
 // Animation variants
 const fadeInUp = {
@@ -83,33 +83,41 @@ const HomePage = () => {
   const faqs = [
     {
       question: "What is this platform about?",
-      answer: "Our platform provides a seamless way to buy, sell, and donate e-waste responsibly. We also offer rewards for contributing to a greener planet.",
+      answer:
+        "Our platform provides a seamless way to buy, sell, and donate e-waste responsibly. We also offer rewards for contributing to a greener planet.",
     },
     {
       question: "How does the reward system work?",
-      answer: "When you donate or sell e-waste through our platform, you earn points that can be redeemed for discounts, gift cards, or other incentives.",
+      answer:
+        "When you donate or sell e-waste through our platform, you earn points that can be redeemed for discounts, gift cards, or other incentives.",
     },
     {
       question: "What types of e-waste can I sell or donate?",
-      answer: "You can sell or donate old phones, laptops, batteries, printers, chargers, and other electronic items that are no longer in use.",
+      answer:
+        "You can sell or donate old phones, laptops, batteries, printers, chargers, and other electronic items that are no longer in use.",
     },
     {
       question: "How do I schedule a pickup for my e-waste?",
-      answer: "Simply log in to your account, select the items you want to recycle, and choose a pickup date. Our team will collect the items from your location.",
+      answer:
+        "Simply log in to your account, select the items you want to recycle, and choose a pickup date. Our team will collect the items from your location.",
     },
     {
       question: "Is donating e-waste free?",
-      answer: "Yes! You can donate your e-waste for free, and you may also receive reward points based on the type and condition of the items.",
+      answer:
+        "Yes! You can donate your e-waste for free, and you may also receive reward points based on the type and condition of the items.",
     },
     {
       question: "How is the e-waste processed after collection?",
-      answer: "We partner with certified recycling facilities to ensure responsible disposal and recycling of e-waste, minimizing environmental impact.",
+      answer:
+        "We partner with certified recycling facilities to ensure responsible disposal and recycling of e-waste, minimizing environmental impact.",
     },
     {
       question: "Can I track my e-waste after donating?",
-      answer: "Yes! You can track the status of your e-waste through your dashboard to see when it's collected and processed.",
+      answer:
+        "Yes! You can track the status of your e-waste through your dashboard to see when it's collected and processed.",
     },
   ];
+
 
   const [impactRef, impactInView] = useInView({
     triggerOnce: true,
@@ -117,6 +125,11 @@ const HomePage = () => {
   });
 
   const [approachRef, approachInView] = useInView({
+    triggerOnce: true,
+    threshold: 0.2,
+  });
+
+  const [footerRef, footerInView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
   });
@@ -129,7 +142,7 @@ const HomePage = () => {
       <motion.div
         ref={approachRef}
         initial="hidden"
-        animate="visible"
+        animate={"visible"}
         variants={fadeInUp}
         className="bg-green-50 py-16 relative overflow-hidden"
       >
@@ -137,7 +150,7 @@ const HomePage = () => {
       </motion.div>
       <Impact />
 
-      <motion.div
+      {/* <motion.div
         ref={approachRef}
         initial="hidden"
         animate={approachInView ? "visible" : "hidden"}
@@ -167,7 +180,7 @@ const HomePage = () => {
             Our sustainable approach helps recycling and reselling Electronic Waste
           </motion.p>
         </div>
-      </motion.div>
+      </motion.div> */}
 
       {/* Footer Section */}
       {/* <motion.footer
@@ -189,12 +202,12 @@ const HomePage = () => {
         </div>
       </motion.footer> */}
 
-      <section className="min-h-screen py-12 px-6 bg-gray-100">
+      <section className="min-h-screen py-12 px-6 bg-gray-100  font-rubik">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-3xl font-semibold text-black mb-6">
+          <h2 className="font-poppins text-3xl font-semibold text-black  mb-6">
             Frequently Asked Questions
           </h2>
-          <p className="text-black text-lg mb-10 max-w-4xl mx-auto">
+          <p className="text-black  text-lg mb-10 max-w-4xl mx-auto font-rubik">
             Have questions? Find answers to the most commonly asked questions
             about our E-Waste Recycling Platform and its features below.
           </p>
@@ -202,11 +215,11 @@ const HomePage = () => {
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="border-b-2 border-black relative"
+                className="border-b-2 border-black  relative"
               >
                 <button
                   onClick={() => toggleAnswer(index)}
-                  className="w-full text-left p-4 flex justify-between items-center text-gray-900"
+                  className="w-full text-left p-4 flex justify-between items-center text-gray-900 "
                 >
                   <span className="text-lg font-medium">{faq.question}</span>
                   <span className="absolute right-0 h-6 w-6">
@@ -218,7 +231,7 @@ const HomePage = () => {
                   </span>
                 </button>
                 {activeIndex === index && (
-                  <div className="p-2 text-gray-700 text-base ml-4 text-justify">
+                  <div className="p-2 text-gray-700  text-base ml-4 text-justify">
                     {faq.answer}
                   </div>
                 )}
@@ -227,6 +240,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+      
     </div>
   );
 };

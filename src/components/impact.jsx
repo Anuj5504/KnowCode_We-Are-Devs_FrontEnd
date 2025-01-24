@@ -18,7 +18,7 @@ export function Impact() {
                         translateZ={60}
                         className="text-neutral-500 pl-8 text-sm max-w-sm mt-2 dark:text-neutral-300"
                     >
-                        Join us in reducing electronic waste by recycling responsibly. Contribute to a cleaner, greener planet by recycling your e-waste today!
+                        VJoin us in reducing electronic waste by recycling responsibly. Contribute to a cleaner, greener planet by recycling your e-waste today!
                     </CardItem>
                     <CardItem translateZ={100} className="w-full mt-4">
                         <Card />

@@ -7,6 +7,7 @@ import LeaderBoard from './components/leaderBoard';
 import ImpactDashboard from './components/impactDashboard';
 import Profile from './components/profile';
 import Store from './components/store';
+import Footer from './components/footer';
 
 function App() {
   return (
@@ -15,10 +16,12 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/leaderboard" element={<LeaderBoard/>} />
-        <Route path="/impact-dashboard" element={<ImpactDashboard/>} />
+        <Route path="/impactdashboard" element={<ImpactDashboard/>} />
         <Route path="/profile" element={<Profile/>} />
         <Route path="/store" element={<Store/>} />
       </Routes>
+
+      <Footer/>
     </div>
   );
 }
