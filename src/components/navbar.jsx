@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, animate } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -16,7 +17,7 @@ const Navbar = () => {
   const dropdownVariants = {
     hidden: {
       opacity: 0,
-      y: -20, 
+      y: -20,
       scale: 0.95,
     },
     visible: {
@@ -53,7 +54,10 @@ const Navbar = () => {
         <div className="flex justify-between h-20 items-center">
           <div className="flex items-center space-x-8">
             <span className="text-2xl font-bold text-green-700">
-              E-Waste<span className="text-orange-500">-X</span>
+              <Link to="/" className="text-2xl font-bold text-green-700">
+                E-Waste<span className="text-orange-500">-X</span>
+              </Link>
+
             </span>
 
             {/* Search Bar */}
@@ -108,51 +112,55 @@ const Navbar = () => {
               </motion.div>
 
               <Tab setPosition={setPosition}>
-                <motion.a
-                  whileHover={{ scale: 1.1 }}
-                  href="/impact-dashboard"
-                  className="text-gray-600 hover:text-green-700 font-medium transition duration-300 flex items-center space-x-2"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                <Link to="/impactdashboard" >
+                  <motion.a
+                    whileHover={{ scale: 1.1 }}
+                    href="/impact-dashboard"
+                    className="text-gray-600 hover:text-green-700 font-medium transition duration-300 flex items-center space-x-2"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                    />
-                  </svg>
-                  <span>Impact Dashboard</span>
-                </motion.a>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                      />
+                    </svg>
+                    <span>Impact Dashboard</span>
+                  </motion.a>
+                </Link>
               </Tab>
 
               <Tab setPosition={setPosition}>
-                <motion.a
-                  whileHover={{ scale: 1.1 }}
-                  href="/leaderboard"
-                  className="text-gray-600 hover:text-green-700 font-medium transition duration-300 flex items-center space-x-2"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
+                <Link to="/leaderboard">
+                  <motion.a
+                    whileHover={{ scale: 1.1 }}
+                    href="/leaderboard"
+                    className="text-gray-600 hover:text-green-700 font-medium transition duration-300 flex items-center space-x-2"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <span>Leaderboard</span>
-                </motion.a>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <span>Leaderboard</span>
+                  </motion.a>
+                </Link>
               </Tab>
 
               {/* Cursor for Slide Tabs */}
@@ -182,12 +190,9 @@ const Navbar = () => {
                       <p className="text-sm font-medium text-gray-900">EcoWarrior</p>
                       <p className="text-sm text-gray-500">eco@warrior.com</p>
                     </div>
-                    <a href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 transition-colors">
+                    <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 transition-colors">
                       Profile
-                    </a>
-                    <a href="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 transition-colors">
-                      Settings
-                    </a>
+                    </Link>
                     <button onClick={() => {/* handle logout */ }} className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
                       Logout
                     </button>
@@ -221,7 +226,7 @@ const Tab = ({ children, setPosition }) => {
     <li
       ref={ref}
       onMouseEnter={handleMouseEnter}
-      onMouseLeave={() => setPosition((prev) => ({ ...prev, opacity: 0 }))} 
+      onMouseLeave={() => setPosition((prev) => ({ ...prev, opacity: 0 }))}
       className="relative z-10 block cursor-pointer"
     >
       {children}
