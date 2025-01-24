@@ -38,7 +38,7 @@ const float = {
     transition: {
       duration: 4,
       repeat: Infinity,
-      repeatType: "reverse",
+      repeatType: 'reverse',
       ease: "easeInOut"
     }
   }
@@ -117,7 +117,6 @@ const HomePage = () => {
             ].map((product, index) => (
               <motion.div 
                 key={index} 
-                variants={fadeInUp}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 initial="initial"
@@ -129,7 +128,8 @@ const HomePage = () => {
                     ...float.animate,
                     transition: {
                       ...float.animate.transition,
-                      delay: index * 0.2
+                      delay: index * 0.2,
+                      repeatType: 'reverse'
                     }
                   }
                 }}
@@ -167,7 +167,6 @@ const HomePage = () => {
             variants={slideInLeft}
             initial="initial"
             animate="animate"
-            variants={float}
             className="text-3xl font-bold text-green-700 text-center mb-8"
           >
             Our Sustainable Approach
