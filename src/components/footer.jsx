@@ -17,7 +17,7 @@ const Footer = () => {
   };
 
   return (
-    <motion.footer 
+    <motion.footer
       className="bg-gradient-to-r from-green-800 to-green-900 text-white"
       initial="hidden"
       animate="visible"
