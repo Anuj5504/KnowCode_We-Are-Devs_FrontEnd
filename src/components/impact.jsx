@@ -18,8 +18,7 @@ export function Impact() {
                         translateZ={60}
                         className="text-neutral-500 pl-8 text-sm max-w-sm mt-2 dark:text-neutral-300"
                     >
-                        Hover over this card to see the background move while content stays stable.
-                        Elements still float in 3D space.
+                        Join us in reducing electronic waste by recycling responsibly. Contribute to a cleaner, greener planet by recycling your e-waste today!
                     </CardItem>
                     <CardItem translateZ={100} className="w-full mt-4">
                         <Card />

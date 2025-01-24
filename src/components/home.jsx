@@ -5,6 +5,8 @@ import HeroSection from './hero';
 import HowWeWork from './howWeWork';
 import { Impact } from './impact';
 import Card from './ui/card';
+import { useState } from 'react';
+import { LuCircleMinus, LuCirclePlus } from 'react-icons/lu';
 
 // Animation variants
 const fadeInUp = {
@@ -72,6 +74,43 @@ const backgroundShimmer = {
 };
 
 const HomePage = () => {
+  const [activeIndex, setActiveIndex] = useState(null);
+
+  const toggleAnswer = (index) => {
+    setActiveIndex(activeIndex === index ? null : index);
+  };
+
+  const faqs = [
+    {
+      question: "What is this platform about?",
+      answer: "Our platform provides a seamless way to buy, sell, and donate e-waste responsibly. We also offer rewards for contributing to a greener planet.",
+    },
+    {
+      question: "How does the reward system work?",
+      answer: "When you donate or sell e-waste through our platform, you earn points that can be redeemed for discounts, gift cards, or other incentives.",
+    },
+    {
+      question: "What types of e-waste can I sell or donate?",
+      answer: "You can sell or donate old phones, laptops, batteries, printers, chargers, and other electronic items that are no longer in use.",
+    },
+    {
+      question: "How do I schedule a pickup for my e-waste?",
+      answer: "Simply log in to your account, select the items you want to recycle, and choose a pickup date. Our team will collect the items from your location.",
+    },
+    {
+      question: "Is donating e-waste free?",
+      answer: "Yes! You can donate your e-waste for free, and you may also receive reward points based on the type and condition of the items.",
+    },
+    {
+      question: "How is the e-waste processed after collection?",
+      answer: "We partner with certified recycling facilities to ensure responsible disposal and recycling of e-waste, minimizing environmental impact.",
+    },
+    {
+      question: "Can I track my e-waste after donating?",
+      answer: "Yes! You can track the status of your e-waste through your dashboard to see when it's collected and processed.",
+    },
+  ];
+
   const [impactRef, impactInView] = useInView({
     triggerOnce: true,
     threshold: 0.2,
@@ -82,20 +121,15 @@ const HomePage = () => {
     threshold: 0.2,
   });
 
-  const [footerRef, footerInView] = useInView({
-    triggerOnce: true,
-    threshold: 0.2,
-  });
-
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white min-h-screen w-full">
       {/* Hero Section */}
       <HeroSection />
 
       <motion.div
         ref={approachRef}
         initial="hidden"
-        animate={"visible"}
+        animate="visible"
         variants={fadeInUp}
         className="bg-green-50 py-16 relative overflow-hidden"
       >
@@ -136,7 +170,7 @@ const HomePage = () => {
       </motion.div>
 
       {/* Footer Section */}
-      <motion.footer
+      {/* <motion.footer
         ref={footerRef}
         initial="hidden"
         animate={footerInView ? "visible" : "hidden"}
@@ -153,7 +187,46 @@ const HomePage = () => {
             <a href="/lets-connect" className="hover:text-green-300">Let's Connect</a>
           </div>
         </div>
-      </motion.footer>
+      </motion.footer> */}
+
+      <section className="min-h-screen py-12 px-6 bg-gray-100">
+        <div className="max-w-6xl mx-auto text-center">
+          <h2 className="text-3xl font-semibold text-black mb-6">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-black text-lg mb-10 max-w-4xl mx-auto">
+            Have questions? Find answers to the most commonly asked questions
+            about our E-Waste Recycling Platform and its features below.
+          </p>
+          <div className="space-y-4 max-w-2xl mx-auto">
+            {faqs.map((faq, index) => (
+              <div
+                key={index}
+                className="border-b-2 border-black relative"
+              >
+                <button
+                  onClick={() => toggleAnswer(index)}
+                  className="w-full text-left p-4 flex justify-between items-center text-gray-900"
+                >
+                  <span className="text-lg font-medium">{faq.question}</span>
+                  <span className="absolute right-0 h-6 w-6">
+                    {activeIndex === index ? (
+                      <LuCircleMinus className="h-full w-full" />
+                    ) : (
+                      <LuCirclePlus className="h-full w-full" />
+                    )}
+                  </span>
+                </button>
+                {activeIndex === index && (
+                  <div className="p-2 text-gray-700 text-base ml-4 text-justify">
+                    {faq.answer}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

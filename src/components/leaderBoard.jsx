@@ -71,7 +71,7 @@ const LeaderBoard = () => {
         animate="visible"
         className="max-w-7xl mx-auto"
       >
-         
+
         <div className="text-center mb-12 ">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Eco<span className="text-green-600">Leaders</span>
@@ -144,9 +144,8 @@ const LeaderBoard = () => {
               <motion.div
                 key={user.username}
                 variants={itemVariants}
-                className={`grid grid-cols-4 py-4 px-6 items-center ${getRankStyle(index)} ${
-                  index < 3 ? 'text-white' : 'text-gray-900'
-                }`}
+                className={`grid grid-cols-4 py-4 px-6 items-center ${getRankStyle(index)} ${index < 3 ? 'text-white' : 'text-gray-900'
+                  }`}
               >
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{getRankIcon(index)}</span>
@@ -175,7 +174,7 @@ const LeaderBoard = () => {
         </div>
 
         {/* Stats Section */}
-        
+
       </motion.div>
     </div>
   );

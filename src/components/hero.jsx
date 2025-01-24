@@ -23,7 +23,7 @@ const HeroSection = () => {
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
-      className="relative bg-green-50 min-h-screen flex items-center justify-center text-center px-6"
+      className="relative bg-green-50 min-h-screen flex items-center justify-center text-center px-6 w-full"
     >
       <motion.div variants={fadeInUp} className="max-w-4xl">
         <motion.h1

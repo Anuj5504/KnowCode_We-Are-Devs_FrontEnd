@@ -48,7 +48,7 @@ const Navbar = () => {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className="bg-white shadow-sm fixed w-full top-0 z-50"
+      className="bg-white shadow-sm fixed w-full top-0 z-50 "
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
@@ -194,7 +194,7 @@ const Navbar = () => {
             </ul>
 
             {/* Profile Dropdown */}
-            <div className="relative">
+            <div className="relative pl-4">
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}

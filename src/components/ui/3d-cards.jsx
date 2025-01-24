@@ -9,7 +9,7 @@ import React, {
 
 const MouseEnterContext = createContext({
   isMouseEntered: false,
-  setIsMouseEntered: (value) => {},
+  setIsMouseEntered: (value) => { },
 });
 
 export const CardContainer = ({
@@ -39,7 +39,7 @@ export const CardContainer = ({
     setIsMouseEntered(false);
     containerRef.current.style.transform = `rotateY(0deg) rotateX(0deg)`;
   };
-  
+
   return (
     <MouseEnterContext.Provider value={{ isMouseEntered, setIsMouseEntered }}>
       <div
