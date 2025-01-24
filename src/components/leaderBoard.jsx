@@ -64,20 +64,69 @@ const LeaderBoard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-24 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-green-50 py-24 px-4 sm:px-6 lg:px-8 ">
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
         className="max-w-7xl mx-auto"
       >
-        <div className="text-center mb-12">
+         
+        <div className="text-center mb-12 ">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Eco<span className="text-green-600">Leaders</span>
           </h1>
           <p className="text-lg text-gray-600">
             Top contributors making a difference in e-waste management
           </p>
+        </div>
+
+        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3 pb-5">
+          <motion.div
+            variants={itemVariants}
+            className="bg-white overflow-hidden shadow rounded-lg"
+          >
+            <div className="px-4 py-5 sm:p-6">
+              <dt className="text-sm font-medium text-gray-500 truncate">
+                Total Participants
+              </dt>
+              <dd className="mt-1 text-3xl font-semibold text-gray-900">
+                {leaderboardData.length}
+              </dd>
+            </div>
+          </motion.div>
+
+          <motion.div
+            variants={itemVariants}
+            className="bg-white overflow-hidden shadow rounded-lg"
+          >
+            <div className="px-4 py-5 sm:p-6">
+              <dt className="text-sm font-medium text-gray-500 truncate">
+                Total Coins Earned
+              </dt>
+              <dd className="mt-1 text-3xl font-semibold text-gray-900">
+                {leaderboardData
+                  .reduce((sum, user) => sum + user.coins, 0)
+                  .toLocaleString()}
+              </dd>
+            </div>
+          </motion.div>
+
+          <motion.div
+            variants={itemVariants}
+            className="bg-white overflow-hidden shadow rounded-lg"
+          >
+            <div className="px-4 py-5  sm:p-6">
+              <dt className="text-sm font-medium text-gray-500 truncate">
+                Total Products Sold
+              </dt>
+              <dd className="mt-1 text-3xl font-semibold text-gray-900">
+                {leaderboardData
+                  .reduce((sum, user) => sum + user.productsSold, 0)
+                  .toLocaleString()}
+              </dd>
+            </div>
+          </motion.div>
         </div>
 
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -126,53 +175,7 @@ const LeaderBoard = () => {
         </div>
 
         {/* Stats Section */}
-        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-3">
-          <motion.div
-            variants={itemVariants}
-            className="bg-white overflow-hidden shadow rounded-lg"
-          >
-            <div className="px-4 py-5 sm:p-6">
-              <dt className="text-sm font-medium text-gray-500 truncate">
-                Total Participants
-              </dt>
-              <dd className="mt-1 text-3xl font-semibold text-gray-900">
-                {leaderboardData.length}
-              </dd>
-            </div>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            className="bg-white overflow-hidden shadow rounded-lg"
-          >
-            <div className="px-4 py-5 sm:p-6">
-              <dt className="text-sm font-medium text-gray-500 truncate">
-                Total Coins Earned
-              </dt>
-              <dd className="mt-1 text-3xl font-semibold text-gray-900">
-                {leaderboardData
-                  .reduce((sum, user) => sum + user.coins, 0)
-                  .toLocaleString()}
-              </dd>
-            </div>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            className="bg-white overflow-hidden shadow rounded-lg"
-          >
-            <div className="px-4 py-5 sm:p-6">
-              <dt className="text-sm font-medium text-gray-500 truncate">
-                Total Products Sold
-              </dt>
-              <dd className="mt-1 text-3xl font-semibold text-gray-900">
-                {leaderboardData
-                  .reduce((sum, user) => sum + user.productsSold, 0)
-                  .toLocaleString()}
-              </dd>
-            </div>
-          </motion.div>
-        </div>
+        
       </motion.div>
     </div>
   );

@@ -112,6 +112,32 @@ const Navbar = () => {
               </motion.div>
 
               <Tab setPosition={setPosition}>
+                <Link to="/store" >
+                  <motion.a
+                    whileHover={{ scale: 1.1 }}
+                    href="/store"
+                    className="text-gray-600 hover:text-green-700 font-medium transition duration-300 flex items-center space-x-2"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                      />
+                    </svg>
+                    <span>Store</span>
+                  </motion.a>
+                </Link>
+              </Tab>
+
+              <Tab setPosition={setPosition}>
                 <Link to="/impactdashboard" >
                   <motion.a
                     whileHover={{ scale: 1.1 }}
