@@ -4,7 +4,7 @@ import Card from "./ui/card";
 
 export function Impact() {
     return (
-        <div className="py-20">
+        <div className="py-20 font-rubik">
             <CardContainer className="inter-var" containerClassName="">
                 <CardBody className="relative bg-white dark:bg-black border border-neutral-200 dark:border-white/[0.2] w-auto sm:w-[30rem] h-auto rounded-xl p-6">
                     <CardItem

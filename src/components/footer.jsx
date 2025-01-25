@@ -18,7 +18,7 @@ const Footer = () => {
 
   return (
     <motion.footer
-      className="bg-gradient-to-r from-green-800 to-green-900 text-white"
+      className="bg-gradient-to-r from-green-800 to-green-900 text-white font-rubik"
       initial="hidden"
       animate="visible"
       variants={footerVariants}

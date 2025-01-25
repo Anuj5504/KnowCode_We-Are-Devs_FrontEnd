@@ -140,7 +140,7 @@ const HowWeWork = () => {
   };
 
   return (
-    <div className="relative  bg-green-50 overflow-hidden flex items-center pt-10 justify-center">
+    <div className="relative  bg-green-50 overflow-hidden flex items-center pt-10 justify-center font-rubik">
       {/* Animated Background */}
       <motion.div
         variants={backgroundVariants}
@@ -161,7 +161,7 @@ const HowWeWork = () => {
               height: `${Math.random() * 100 + 50}px`,
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animationDelay: `${i * 0.2}s`,
+              animationDelay: `${i * 0.5}s`,
             }}
           />
         ))}
@@ -176,7 +176,7 @@ const HowWeWork = () => {
           variants={scrollVariants}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4 font-poppins">
             How We <span className="text-green-600">Work</span>
           </h2>
           <p className="text-xl text-gray-600">
@@ -247,7 +247,7 @@ const HowWeWork = () => {
                   >
                     {/* Step Number */}
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2
-                      bg-white px-4 py-1 rounded-full shadow-md">
+                      bg-green-400 px-4 py-1 rounded-full shadow-md">
                       <span className="text-sm font-bold text-gray-600">Step {index + 1}</span>
                     </div>
 

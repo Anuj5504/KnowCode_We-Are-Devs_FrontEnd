@@ -71,7 +71,7 @@ const Products = () => {
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-6 px-4">
+    <div className="min-h-screen bg-gray-50 py-6 px-4 font-rubik">
       <div className="max-w-7xl mx-auto">
         {/* Compact Search and Filter Section */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">

@@ -56,7 +56,7 @@ const MainPage = () => {
             dragMomentum={false}
             dragElastic={0}
             initial={{ x: 20, y: '20%' }}
-            className="fixed left-4 top-0 z-50 cursor-move"
+            className="fixed left-4 top-0 z-50 cursor-move font-rubik"
             whileHover={{ scale: 1.02 }}
             whileDrag={{ scale: 1.05 }}
         >
@@ -203,7 +203,7 @@ const MainPage = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 font-rubik">
             {renderComponent()}
             {isMobile ? <MobileNav /> : <FloatingSidebar />}
         </div>

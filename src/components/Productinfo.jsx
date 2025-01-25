@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
-import { FaRecycle, FaLeaf, FaMapMarkerAlt, FaBox, FaWeightHanging, FaMinus, FaPlus } from 'react-icons/fa';
+import {toast } from 'react-hot-toast';
+import { FaRecycle, FaLeaf, FaMapMarkerAlt, FaBox, FaWeightHanging, FaMinus, FaPlus, FaHistory, FaInfo } from 'react-icons/fa';
 import { MdVerified } from 'react-icons/md';
 
 const ProductInfo = () => {
@@ -14,10 +14,16 @@ const ProductInfo = () => {
     const [showBidConfirm, setShowBidConfirm] = useState(false);
     const [showBuyConfirm, setShowBuyConfirm] = useState(false);
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const [bids, setBids] = useState([]);
+    const [highestBid, setHighestBid] = useState(0);
 
     useEffect(() => {
         fetchProductDetails();
-        const interval = setInterval(fetchProductDetails, 30000); // Refresh every 30 seconds
+        fetchBidHistory();
+        const interval = setInterval(() => {
+            fetchProductDetails();
+            fetchBidHistory();
+        }, 30000); // Refresh every 30 seconds
         return () => clearInterval(interval);
     }, [id]);
 
@@ -35,6 +41,26 @@ const ProductInfo = () => {
         }
     };
 
+    const fetchBidHistory = async () => {
+        try {
+            const response = await fetch(`http://localhost:3000/api/bid/${id}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch bid history');
+            }
+            const data = await response.json();
+            setBids(data);
+            
+            // Set highest bid
+            if (data.length > 0) {
+                const maxBid = Math.max(...data.map(bid => bid.amount));
+                setHighestBid(maxBid);
+            }
+        } catch (error) {
+            console.error('Error fetching bid history:', error);
+            toast.error('Failed to fetch bid history');
+        }
+    };
+
     const formatWalletAddress = (address) => {
         if (!address) return 'Unknown';
         return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
@@ -46,37 +72,90 @@ const ProductInfo = () => {
             return;
         }
 
-        if (!bidAmount || Number(bidAmount) <= 0) {
+        const bidAmountNum = Number(bidAmount);
+        if (!bidAmountNum || bidAmountNum <= 0) {
             toast.error('Please enter a valid bid amount');
+            setShowBidConfirm(false);
             return;
         }
+        console.log(bidAmountNum);
+        console.log(highestBid);
+
+        // Enhanced bid validation with better error messages
+        if (Number(bidAmountNum) <= Number(highestBid)) {
+            toast.error(`Bid too low! Current highest bid is ₹${highestBid}`, {
+              duration: 4000,
+              icon: '📉',
+              style: {
+                backgroundColor: '#FEF2F2',
+                color: '#991B1B',
+              },
+            });
+            setShowBidConfirm(false);
+            return;
+          }
+
+        const loadingToast = toast.loading('Placing your bid...', {
+            style: {
+                backgroundColor: '#FEF3C7',
+                color: '#92400E'
+            }
+        });
 
         try {
-            const response = await fetch(`http://localhost:3000/api/ewaste/${id}/bid`, {
+            const response = await fetch(`http://localhost:3000/api/bid/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': userInfo.walletAddress
+                    'Authorization': `${userInfo.walletAddress}`
                 },
-                body: JSON.stringify({ amount: Number(bidAmount) })
+                body: JSON.stringify({ 
+                    amount: bidAmountNum,
+                    ewasteId: id
+                })
             });
 
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || 'Failed to place bid');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to place bid');
+            }
 
-            toast.success('Bid placed successfully! 🎉');
+            const data = await response.json();
+            
+            toast.success('🎉 Bid placed successfully!', {
+                duration: 5000,
+                icon: '🎯',
+                style: {
+                    backgroundColor: '#F0FDF4',
+                    color: '#166534'
+                }
+            });
             setShowBidConfirm(false);
-            fetchProductDetails();
             setBidAmount('');
+            
+            await Promise.all([
+                fetchProductDetails(),
+                fetchBidHistory()
+            ]);
         } catch (error) {
-            toast.error(error.message || 'Failed to place bid');
+            console.error('Bid error:', error);
+            toast.error(error.message || 'Failed to place bid', {
+                duration: 4000,
+                icon: '❌',
+                style: {
+                    backgroundColor: '#FEF2F2',
+                    color: '#991B1B'
+                }
+            });
+        } finally {
+            toast.dismiss(loadingToast);
         }
     };
 
     const handleBidChange = (action) => {
         const currentBid = Number(bidAmount) || 0;
-        const minBid = product.price || 0;
-        const increment = 100; // Increment by 100 rupees
+        const minBid = highestBid > 0 ? highestBid + 1 : product.price;
+        const increment = 1; // Change increment to 1 rupee
 
         if (action === 'increase') {
             setBidAmount(String(currentBid + increment));
@@ -93,7 +172,7 @@ const ProductInfo = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:3000/api/ewaste/${id}/buy`, {
+            const response = await fetch(`http://localhost:3000/api/bid/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -138,7 +217,7 @@ const ProductInfo = () => {
     if (!product) return null;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-6">
+        <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-6 font-rubik">
             <div className="max-w-6xl mx-auto px-4">
                 <motion.div
                     initial={{ opacity: 0 }}
@@ -234,7 +313,27 @@ const ProductInfo = () => {
                                         <>
                                             <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl">
                                                 <h3 className="text-base font-semibold text-blue-900 mb-1">Price</h3>
-                                                <p className="text-2xl font-bold text-blue-600">₹{product.price}</p>
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-2xl font-bold text-gray-900">
+                                                            ₹{product.price}
+                                                        </span>
+                                                        {highestBid > 0 && (
+                                                            <div className="flex items-center gap-2 bg-yellow-100 px-3 py-1.5 rounded-full">
+                                                                <span className="flex items-center gap-1">
+                                                                    <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
+                                                                    <span className="text-yellow-800 text-sm font-medium">Highest Bid:</span>
+                                                                </span>
+                                                                <span className="text-lg font-bold text-yellow-900">₹{highestBid}</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {highestBid > 0 && (
+                                                        <p className="text-sm text-gray-500">
+                                                            Min. next bid: <span className="font-semibold text-green-600">₹{highestBid + 1}</span>
+                                                        </p>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             {product.biddingEnabled && (
@@ -288,6 +387,101 @@ const ProductInfo = () => {
                     </div>
                 </motion.div>
             </div>
+
+            {/* Enhanced Bid History Section */}
+            <div className="mx-auto lg:mx-24">
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-2xl font-bold text-gray-900">Bid History</h3>
+                    {highestBid > 0 && (
+                        <div className="flex items-center gap-2 bg-yellow-100 px-4 py-2 rounded-full">
+                            <span className="text-yellow-800 font-medium">Highest Bid:</span>
+                            <span className="text-xl font-bold text-yellow-900">₹{highestBid}</span>
+                        </div>
+                    )}
+                </div>
+
+                {bids.length > 0 ? (
+                    <div className="space-y-4">
+                        {bids.map((bid, index) => (
+                            <motion.div
+                                key={bid._id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.1 }}
+                                className={`bg-white rounded-xl shadow-sm p-4 border ${
+                                    index === 0 
+                                        ? 'border-yellow-300 bg-gradient-to-r from-yellow-50 to-white' 
+                                        : 'border-gray-100'
+                                }`}
+                            >
+                                <div className="flex justify-between items-start">
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                                {bid.bidder.walletAddress.substring(2, 4)}
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-gray-600">
+                                                    {formatWalletAddress(bid.bidder.walletAddress)}
+                                                </p>
+                                                <p className="text-xs text-gray-400">
+                                                    {new Date(bid.createdAt).toLocaleString()}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-lg font-bold text-gray-900">₹{bid.amount}</p>
+                                        {index === 0 && (
+                                            <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">
+                                                <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
+                                                Highest Bid
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                ) : (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="bg-white rounded-xl shadow-sm p-8 text-center"
+                    >
+                        <div className="flex flex-col items-center gap-3">
+                            <FaHistory className="text-4xl text-gray-300" />
+                            <p className="text-gray-500">No bids yet. Be the first to bid!</p>
+                            <p className="text-sm text-gray-400">
+                                Minimum bid amount: ₹{product.price}
+                            </p>
+                        </div>
+                    </motion.div>
+                )}
+            </div>
+
+            {/* Minimum Next Bid Info */}
+            {product.biddingEnabled && highestBid > 0 && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-4 bg-gradient-to-r from-yellow-50 to-white border border-yellow-200 rounded-xl p-4"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-yellow-100 rounded-full">
+                            <FaInfo className="text-yellow-600" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-yellow-800">
+                                Minimum next bid must be at least ₹1 more than the current highest bid
+                            </p>
+                            <p className="text-lg font-bold text-yellow-900">
+                                Minimum next bid: ₹{highestBid + 1}
+                            </p>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
 
             {/* Confirmation Modals */}
             <AnimatePresence>

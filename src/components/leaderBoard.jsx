@@ -64,7 +64,7 @@ const LeaderBoard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-green-50 py-24 px-4 sm:px-6 lg:px-8 ">
+    <div className="min-h-screen bg-green-50 py-24 px-4 sm:px-6 lg:px-8  font-rubik">
       <motion.div
         variants={containerVariants}
         initial="hidden"

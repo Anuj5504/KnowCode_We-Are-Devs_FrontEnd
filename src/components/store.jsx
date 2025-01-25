@@ -89,7 +89,7 @@ const Store = () => {
   const cryptoRates = calculateCrypto(exchangeAmount);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-24 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-24 px-4 sm:px-6 lg:px-8 font-rubik">
       <motion.div
         variants={containerVariants}
         initial="hidden"

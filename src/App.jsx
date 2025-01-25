@@ -13,6 +13,8 @@ import MainPage from './components/Mainpage';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { motion } from 'framer-motion';
+import ProductInfo from './components/Productinfo';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -27,6 +29,7 @@ function App() {
      
         <>
           <ToastContainer />
+          <Toaster/>
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
@@ -36,6 +39,7 @@ function App() {
             <Route path="/redeemcoin" element={<Store />} />
             <Route path="/main" element={<MainPage />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/product/:id" element={<ProductInfo/>} />
           </Routes>
           <Footer />
         </>

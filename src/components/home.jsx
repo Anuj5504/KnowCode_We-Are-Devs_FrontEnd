@@ -135,7 +135,7 @@ const HomePage = () => {
   });
 
   return (
-    <div className="bg-white min-h-screen w-full">
+    <div className="bg-white min-h-screen w-full font-rubik">
       {/* Hero Section */}
       <HeroSection />
 
@@ -148,7 +148,7 @@ const HomePage = () => {
       >
         <HowWeWork />
       </motion.div>
-      
+
       <Impact />
 
       {/* <motion.div
